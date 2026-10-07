@@ -48,5 +48,5 @@ that frame; reading the translated `ftCo_80099794` next to the UCF cave found th
 
 ## Setup notes that are not code
 
-- `install.sh` does not work as-is: its `--depth 1` clone lacks the upstream commit `bootstrap_port.py` checks, and `setup.sh` clones doldecomp/melee at HEAD instead of the pinned revision. Workaround: full clone, and `git -C deps/melee checkout 05a1394faea2aac458e4bdd030621d8a5631ae62`.
+- Fixed: `install.sh` used to fail on a fresh Mac. Its `--depth 1` clone lacked the upstream commit `bootstrap_port.py` checks, and `setup.sh` cloned doldecomp/melee at HEAD instead of the pinned revision. `install.sh` now clones full history (and unshallows an older download), and `setup.sh` fetches the commit from `tools/port_source_pins.json` directly, repairing a checkout left at HEAD.
 - 1000 Hz polling without a driver (the README claim) did not work here: `SetPipePolicy` is rejected, and with no driver Apple's HID driver owns the adapter exclusively. The legacy GCAdapterDriver.kext (Permissive Security, SIP off) gives ~540 Hz, which looks like the Mayflash hardware cap.

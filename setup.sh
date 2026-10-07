@@ -58,9 +58,18 @@ python3 -c "import PIL" 2>/dev/null || python3 -m pip install --quiet --user pil
 
 step "doldecomp/melee (function names and animation helpers the port reads at build time)"
 DECOMP="${DASHDANCE_DECOMP:-$ROOT/deps/melee}"
-if [[ ! -d "$DECOMP/src" ]]; then
-  mkdir -p "$ROOT/deps"
-  git clone --depth 1 https://github.com/doldecomp/melee.git "$DECOMP"
+# bootstrap_port.py only accepts the exact revision in tools/port_source_pins.json, so fetch that commit
+# (shallow) instead of upstream HEAD. Also repairs a checkout left at HEAD by an older setup.sh.
+PIN="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["decomp"]["commit"])' "$ROOT/tools/port_source_pins.json")"
+if [[ ! -d "$DECOMP/.git" ]]; then
+  mkdir -p "$DECOMP"
+  git -C "$DECOMP" init --quiet
+  git -C "$DECOMP" remote add origin https://github.com/doldecomp/melee.git
+fi
+if [[ "$(git -C "$DECOMP" rev-parse HEAD 2>/dev/null)" != "$PIN" ]]; then
+  [[ -z "${DASHDANCE_DECOMP:-}" ]] || fail "DASHDANCE_DECOMP ($DECOMP) must be checked out at $PIN"
+  git -C "$DECOMP" fetch --depth 1 --quiet origin "$PIN"
+  git -C "$DECOMP" checkout --quiet --detach "$PIN"
 fi
 
 step "main.dol from your disc"

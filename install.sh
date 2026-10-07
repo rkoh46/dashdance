@@ -22,10 +22,13 @@ fi
 
 if [[ -d "$DIR/.git" ]]; then
   yellow "Updating Dashdance in $DIR"
+  # The build verifies the Slippi files against an upstream commit in this repo's history, so a shallow
+  # download from an older installer has to be completed first.
+  [[ "$(git -C "$DIR" rev-parse --is-shallow-repository)" == "true" ]] && git -C "$DIR" fetch --unshallow --quiet origin
   git -C "$DIR" pull --ff-only --quiet
 else
   yellow "Downloading Dashdance into $DIR"
-  git clone --depth 1 --branch dashdance2 --quiet https://github.com/rkoh46/dashdance.git "$DIR"
+  git clone --branch dashdance2 --quiet https://github.com/rkoh46/dashdance.git "$DIR"   # full history: see above
 fi
 
 ISO="${1:-${DASHDANCE_ISO:-}}"

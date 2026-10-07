@@ -44,6 +44,7 @@ This is [rkoh46's](https://github.com/rkoh46/dashdance) playtest fork of [TheAnd
 - **GameCube adapter shutdown fixes:** the adapter is closed and its reader thread joined cleanly at exit.
 - **Side-by-side install:** `tools/mac/rebuild.sh` builds and installs the fork as *DashDance2* with an orange icon and its own bundle identifier, so it can live next to the original app.
 - **More netplay logging:** every ENet peer event is logged, so a dropped game can be explained from the session log.
+- **The one-line installer works on a fresh Mac.** It used to stop at *"--decomp-root HEAD must equal pinned revision"*: `setup.sh` now fetches the exact doldecomp/melee commit the build is pinned to, and `install.sh` downloads the full history the build checks the Slippi files against. An install that already failed is repaired by running the installer again.
 
 The full list, with evidence and method for each fix, is in [docs/PR.md](docs/PR.md) and [docs/MAC_FIXES.md](docs/MAC_FIXES.md). Build it the same way as the original (see [Get Dashdance](#get-dashdance)); developers rebuild with `tools/mac/rebuild.sh`.
 
@@ -101,6 +102,15 @@ curl -fsSL https://raw.githubusercontent.com/rkoh46/dashdance/dashdance2/install
 ```
 
 When it asks, drag your Melee disc image into the Terminal window and press Return. Dashdance builds itself on your Mac from your own disc, which takes ten to fifteen minutes the first time. Then it's in your Applications folder, and it opens. To update, paste the same line again.
+
+**If the install stopped partway** (for example with *"must equal pinned revision"* from an older version of the installer), paste the same line again. It fixes the download in `~/Dashdance` and picks up where it left off; it remembers your disc, so you won't be asked again.
+
+**Building by hand.** Clone the full repository (not `--depth 1`: the build checks the Slippi files against a commit in its history), then run `setup.sh` with your disc. It fetches doldecomp/melee at the revision pinned in [`tools/port_source_pins.json`](tools/port_source_pins.json).
+
+```bash
+git clone --branch dashdance2 https://github.com/rkoh46/dashdance.git ~/Dashdance
+~/Dashdance/setup.sh /path/to/melee.iso
+```
 
 **On iPhone or iPad.** Dashdance can't be on the App Store, because it's built from your own disc. You can still put it on your own device with AltStore, SideStore or Sideloadly. For iPhone Duo, build with Xcode 27.1 or later so it fills both displays. [See how](docs/TECHNICAL.md#iphone-and-ipad-your-own-device).
 
