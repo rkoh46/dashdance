@@ -58,9 +58,12 @@ if [[ -n "$ACTOOL_DEV" ]] && DEVELOPER_DIR="$ACTOOL_DEV" xcrun --find actool >/d
 else
   ICONSET="$(mktemp -d)/AppIcon.iconset"
   mkdir -p "$ICONSET"
+  # Without Xcode the orange tint above is never compiled, so the side-by-side copy uses the orange master instead.
+  MASTER="$ROOT/port/app/icons/AppIcon-1024.png"
+  [[ "$APP_NAME" != "Dashdance" ]] && MASTER="$ROOT/port/app/icons/AppIcon-orange-1024.png"
   for size in 16 32 128 256 512; do
-    sips -z $size $size "$ROOT/port/app/icons/AppIcon-1024.png" --out "$ICONSET/icon_${size}x${size}.png" >/dev/null
-    sips -z $((size*2)) $((size*2)) "$ROOT/port/app/icons/AppIcon-1024.png" --out "$ICONSET/icon_${size}x${size}@2x.png" >/dev/null
+    sips -z $size $size "$MASTER" --out "$ICONSET/icon_${size}x${size}.png" >/dev/null
+    sips -z $((size*2)) $((size*2)) "$MASTER" --out "$ICONSET/icon_${size}x${size}@2x.png" >/dev/null
   done
   iconutil -c icns "$ICONSET" -o "$APP/Contents/Resources/AppIcon.icns"
 fi

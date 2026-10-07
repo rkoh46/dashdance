@@ -69,6 +69,7 @@ All in `tools/mac/`, written up for agents in the `fix-logs` skill (`desync.md`,
 
 - Installer works on a fresh Mac: `setup.sh` fetches doldecomp/melee at the commit pinned in `tools/port_source_pins.json` (it cloned HEAD, which `bootstrap_port.py` rejects), and `install.sh` clones full history, which the Slippi file check needs.
 - `setup.sh` also builds the replay playback executable, so Watch works in an app built by the installer.
+- A side-by-side copy gets its orange icon without Xcode too: `tools/package_macos_app.sh` falls back to `port/app/icons/AppIcon-orange-1024.png` when `actool` is missing.
 
 ## Before opening
 
