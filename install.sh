@@ -45,9 +45,10 @@ print -r -- "$ISO" > "$DIR/.disc-path"
 yellow "Building Dashdance from your disc (about ten to fifteen minutes the first time)"
 DASHDANCE_NO_OPEN=1 "$DIR/setup.sh" "$ISO" < /dev/tty   # setup may run Homebrew's installer, which needs the terminal to ask for your password
 
+APP="${DASHDANCE_APP_NAME:-DashDance2}"   # setup.sh packages this fork under its own name, next to the original Dashdance
 DEST=/Applications
 [[ -w "$DEST" ]] || { DEST="$HOME/Applications"; mkdir -p "$DEST"; }
-rm -rf "$DEST/Dashdance.app" "$DEST/iSlippi.app"   # also the app's earlier name
-ditto "$DIR/dist/Dashdance.app" "$DEST/Dashdance.app"
-yellow "Dashdance is in $DEST. Opening it now."
-open "$DEST/Dashdance.app" --args --iso "$ISO" --choose-disc
+rm -rf "$DEST/$APP.app"   # replace only this fork's copy; an original Dashdance.app stays
+ditto "$DIR/dist/$APP.app" "$DEST/$APP.app"
+yellow "$APP is in $DEST. Opening it now."
+open "$DEST/$APP.app" --args --iso "$ISO" --choose-disc

@@ -29,7 +29,7 @@ Players use `install.sh` (the one line in the README): it clones into ~/Dashdanc
 Applications and opens it. Developers call `setup.sh` directly:
 
 ```bash
-./setup.sh /path/to/melee.iso            # macOS app -> dist/Dashdance.app
+./setup.sh /path/to/melee.iso            # macOS app -> dist/DashDance2.app on this fork (DASHDANCE_APP_NAME=Dashdance for the original name)
 ./setup.sh /path/to/melee.iso --ios      # iPad/iPhone Simulator app (needs Xcode)
 ./setup.sh /path/to/melee.iso --visionos # Vision Pro Simulator app (needs Xcode)
 ./setup.sh /path/to/melee.iso --device   # dist/Dashdance.ipa for AltStore/SideStore/Sideloadly; --team auto signs and installs over USB

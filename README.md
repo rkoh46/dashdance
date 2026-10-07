@@ -101,7 +101,7 @@ Every other way to play Melee on a Mac runs a GameCube in software, one instruct
 curl -fsSL https://raw.githubusercontent.com/rkoh46/dashdance/dashdance2/install.sh | zsh
 ```
 
-When it asks, drag your Melee disc image into the Terminal window and press Return. Dashdance builds itself on your Mac from your own disc, which takes ten to fifteen minutes the first time. Then it's in your Applications folder, and it opens. To update, paste the same line again.
+When it asks, drag your Melee disc image into the Terminal window and press Return. Dashdance builds itself on your Mac from your own disc, which takes fifteen to twenty minutes the first time. Then it's in your Applications folder as **DashDance2**, with an orange icon, and it opens. It installs next to the original Dashdance and leaves it alone, so you can keep both. To update, paste the same line again.
 
 **If the install stopped partway** (for example with *"must equal pinned revision"* from an older version of the installer), paste the same line again. It fixes the download in `~/Dashdance` and picks up where it left off; it remembers your disc, so you won't be asked again.
 

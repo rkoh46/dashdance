@@ -91,11 +91,22 @@ case "$TARGET" in
       -DMELEE_DECOMP_ROOT="$DECOMP" -DMELEE_DOL_PATH="$DOL" -DMELEE_PORT_GENERATED_DIR="$BUILD/generated/guest" \
       -DMELEE_BUILD_PORT_TESTS=OFF -DMELEE_BUILD_PORT_HEADLESS=OFF -DMELEE_BUILD_PORT_METAL=ON >/dev/null
     cmake --build "$BUILD" --target melee_port_mac --parallel "$JOBS"
-    step "Packaging Dashdance.app"
+    # Replay playback ("Watch" on Recent games): the same game translated with Slippi's playback codes, bundled
+    # as the app's second executable. Same steps as tools/mac/rebuild.sh.
+    PBUILD="$ROOT/build/mac-playback"
+    step "Building replay playback (Watch on Recent games)"
+    python3 "$ROOT/tools/bootstrap_port.py" --decomp-root "$DECOMP" --dol "$DOL" --build-dir "$PBUILD" --playback --gct-base 0x8065CC80 --macos-arch arm64 --stage generate
+    cmake -S "$ROOT" -B "$PBUILD" -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+      -DMELEE_DECOMP_ROOT="$DECOMP" -DMELEE_DOL_PATH="$DOL" -DMELEE_PORT_GENERATED_DIR="$PBUILD/generated/guest" \
+      -DMELEE_BUILD_PORT_TESTS=OFF -DMELEE_BUILD_PORT_HEADLESS=OFF -DMELEE_BUILD_PORT_METAL=ON >/dev/null
+    cmake --build "$PBUILD" --target melee_port_mac --parallel "$JOBS"
+    # This fork installs as DashDance2 (orange icon, own bundle id) so it sits next to the original Dashdance.
+    export APP_NAME="${DASHDANCE_APP_NAME:-DashDance2}"
+    step "Packaging $APP_NAME.app"
     "$ROOT/tools/package_macos_app.sh" "$BUILD" "$ROOT/dist"
     echo
-    echo "Done. Opening dist/Dashdance.app — choose your disc in the dashboard the first time (it is remembered)."
-    [[ -n "${DASHDANCE_NO_OPEN:-}" ]] || open "$ROOT/dist/Dashdance.app" --args --iso "$ISO" --choose-disc   # install.sh opens the Applications copy instead
+    echo "Done. Opening dist/$APP_NAME.app — choose your disc in the dashboard the first time (it is remembered)."
+    [[ -n "${DASHDANCE_NO_OPEN:-}" ]] || open "$ROOT/dist/$APP_NAME.app" --args --iso "$ISO" --choose-disc   # install.sh opens the Applications copy instead
     ;;
   device)
     # Your own iPhone or iPad. The app contains the translated game, so it is for your own device only;

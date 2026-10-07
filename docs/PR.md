@@ -68,7 +68,9 @@ All in `tools/mac/`, written up for agents in the `fix-logs` skill (`desync.md`,
 - `slippi: peer health` every 5 s (unacknowledged reliable commands per ENet peer) and `MELEE_NET_DROP_CONNECT=1` (ignore incoming ENet connects, a one-way NAT) for netplay connection tests with `--local-peer`.
 
 - Installer works on a fresh Mac: `setup.sh` fetches doldecomp/melee at the commit pinned in `tools/port_source_pins.json` (it cloned HEAD, which `bootstrap_port.py` rejects), and `install.sh` clones full history, which the Slippi file check needs.
+- `setup.sh` also builds the replay playback executable, so Watch works in an app built by the installer.
 
 ## Before opening
 
 - Drop the "Fork workflow" section from `CLAUDE.md`, `.agents/skills/fix-logs`, `.claude/skills/fix-logs` and this file.
+- Set the default app name in `setup.sh` and `install.sh` (`DASHDANCE_APP_NAME`) back to `Dashdance`; the fork installs as DashDance2.
