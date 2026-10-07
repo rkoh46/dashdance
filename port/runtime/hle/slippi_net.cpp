@@ -538,6 +538,16 @@ void NetplayClient::ThreadFunc() {
       case ENET_EVENT_TYPE_DISCONNECT: {
         std::string key = peer_key(ev.peer);
         { bool in_use = false; for (auto* sp : server_) if (sp == ev.peer) in_use = true; log_peer(ev.data ? "disconnected by the opponent" : "timed out or closed", client_, ev.peer, in_use, ev.data); }
+        // ENet has already reset the peer (rtt 500, ids 4095 above); the cause and timings it recorded first say which
+        // side ended the connection: the opponent's disconnect command, or our reliable commands going unacknowledged.
+        {
+          const char* cause = ev.peer->disconnectCause == ENET_PEER_DISCONNECT_CAUSE_REMOTE  ? "the opponent sent a disconnect"
+                            : ev.peer->disconnectCause == ENET_PEER_DISCONNECT_CAUSE_TIMEOUT ? "timed out: reliable data not acknowledged"
+                            : ev.peer->disconnectCause == ENET_PEER_DISCONNECT_CAUSE_LOCAL   ? "closed by this side"
+                                                                                              : "unknown";
+          host::log("slippi: disconnect cause for %x:%u: %s (rtt %u ms, last packet from them %u ms before)", ev.peer->address.host,
+                    ev.peer->address.port, cause, ev.peer->disconnectRoundTripTime, ev.peer->disconnectReceiveAge);
+        }
         if (active_connections_.count(key) && active_connections_[key].count(ev.peer)) active_connections_[key][ev.peer].is_disconnected = true;
         // A player is gone when no connected peer of theirs is left under any address, not when the peers under this
         // one address are. Both sides dial each other, and the opponent's real port can differ from the one matchmaking

@@ -199,6 +199,7 @@ enet_host_connect (ENetHost * host, const ENetAddress * address, size_t channelC
       return NULL;
     currentPeer -> channelCount = channelCount;
     currentPeer -> state = ENET_PEER_STATE_CONNECTING;
+    currentPeer -> disconnectCause = ENET_PEER_DISCONNECT_CAUSE_NONE;
     currentPeer -> address = * address;
     currentPeer -> connectID = ++ host -> randomSeed;
 

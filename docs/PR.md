@@ -66,6 +66,7 @@ All in `tools/mac/`, written up for agents in the `fix-logs` skill (`desync.md`,
 - `MELEE_PLAY_REPLAY=<n>` / `reveal:<n>`: presses a recent game's Watch or Show in Finder button (UI test aid).
 
 - `slippi: peer health` every 5 s (unacknowledged reliable commands per ENet peer) and `MELEE_NET_DROP_CONNECT=1` (ignore incoming ENet connects, a one-way NAT) for netplay connection tests with `--local-peer`.
+- `slippi: disconnect cause`: ENet records why a connection ended (the opponent's disconnect command, a reliable-data timeout, or this side) with the RTT and time since their last packet before `enet_peer_reset` wipes the peer, so a dropped game shows which side ended it.
 
 - Installer works on a fresh Mac: `setup.sh` fetches doldecomp/melee at the commit pinned in `tools/port_source_pins.json` (it cloned HEAD, which `bootstrap_port.py` rejects), and `install.sh` clones full history, which the Slippi file check needs.
 - `setup.sh` also builds the replay playback executable, so Watch works in an app built by the installer.

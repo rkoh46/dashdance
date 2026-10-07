@@ -4,6 +4,7 @@
 */
 #include <string.h>
 #define ENET_BUILDING_LIB 1
+#include "enet/time.h"
 #include "enet/enet.h"
 
 /** @defgroup peer ENet peer functions 
@@ -534,6 +535,9 @@ enet_peer_disconnect (ENetPeer * peer, enet_uint32 data)
         peer -> state == ENET_PEER_STATE_ZOMBIE)
       return;
 
+    peer -> disconnectCause = ENET_PEER_DISCONNECT_CAUSE_LOCAL;
+    peer -> disconnectRoundTripTime = peer -> roundTripTime;
+    peer -> disconnectReceiveAge = peer -> lastReceiveTime ? ENET_TIME_DIFFERENCE (peer -> host -> serviceTime, peer -> lastReceiveTime) : 0;
     enet_peer_reset_queues (peer);
 
     command.header.command = ENET_PROTOCOL_COMMAND_DISCONNECT;

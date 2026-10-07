@@ -313,7 +313,21 @@ typedef struct _ENetPeer
    enet_uint32   unsequencedWindow [ENET_PEER_UNSEQUENCED_WINDOW_SIZE / 32]; 
    enet_uint32   eventData;
    size_t        totalWaitingData;
+   /* Dashdance: why the last connection on this peer ended (ENET_PEER_DISCONNECT_CAUSE_*), with the round-trip time
+      and the time since the peer's last packet when that was decided. enet_peer_reset leaves these alone so the
+      DISCONNECT event can still report them; a new connection on the peer clears them. */
+   enet_uint32   disconnectCause;
+   enet_uint32   disconnectRoundTripTime;
+   enet_uint32   disconnectReceiveAge;
 } ENetPeer;
+
+enum
+{
+   ENET_PEER_DISCONNECT_CAUSE_NONE    = 0,
+   ENET_PEER_DISCONNECT_CAUSE_REMOTE  = 1, /**< the peer sent a disconnect command */
+   ENET_PEER_DISCONNECT_CAUSE_TIMEOUT = 2, /**< a reliable command was not acknowledged within the timeout */
+   ENET_PEER_DISCONNECT_CAUSE_LOCAL   = 3  /**< this side called enet_peer_disconnect */
+};
 
 /** An ENet packet compressor for compressing UDP packets before socket sends or receives.
  */

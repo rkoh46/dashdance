@@ -9,6 +9,15 @@
 #include "enet/time.h"
 #include "enet/enet.h"
 
+/* Dashdance: remember why a connection ended before enet_peer_reset wipes the peer (see ENetPeer::disconnectCause). */
+static void
+enet_protocol_record_disconnect_cause (ENetHost * host, ENetPeer * peer, enet_uint32 cause)
+{
+    peer -> disconnectCause = cause;
+    peer -> disconnectRoundTripTime = peer -> roundTripTime;
+    peer -> disconnectReceiveAge = peer -> lastReceiveTime ? ENET_TIME_DIFFERENCE (host -> serviceTime, peer -> lastReceiveTime) : 0;
+}
+
 static size_t commandSizes [ENET_PROTOCOL_COMMAND_COUNT] =
 {
     0,
@@ -318,6 +327,7 @@ enet_protocol_handle_connect (ENetHost * host, ENetProtocolHeader * header, ENet
       return NULL;
     peer -> channelCount = channelCount;
     peer -> state = ENET_PEER_STATE_ACKNOWLEDGING_CONNECT;
+    peer -> disconnectCause = ENET_PEER_DISCONNECT_CAUSE_NONE;
     peer -> connectID = command -> connect.connectID;
     peer -> address = host -> receivedAddress;
     peer -> outgoingPeerID = ENET_NET_TO_HOST_16 (command -> connect.outgoingPeerID);
@@ -800,6 +810,7 @@ enet_protocol_handle_disconnect (ENetHost * host, ENetPeer * peer, const ENetPro
     if (peer -> state == ENET_PEER_STATE_DISCONNECTED || peer -> state == ENET_PEER_STATE_ZOMBIE || peer -> state == ENET_PEER_STATE_ACKNOWLEDGING_DISCONNECT)
       return 0;
 
+    enet_protocol_record_disconnect_cause (host, peer, ENET_PEER_DISCONNECT_CAUSE_REMOTE);
     enet_peer_reset_queues (peer);
 
     if (peer -> state == ENET_PEER_STATE_CONNECTION_SUCCEEDED || peer -> state == ENET_PEER_STATE_DISCONNECTING || peer -> state == ENET_PEER_STATE_CONNECTING)
@@ -1437,6 +1448,7 @@ enet_protocol_check_timeouts (ENetHost * host, ENetPeer * peer, ENetEvent * even
                (outgoingCommand -> roundTripTimeout >= outgoingCommand -> roundTripTimeoutLimit &&
                  ENET_TIME_DIFFERENCE (host -> serviceTime, peer -> earliestTimeout) >= peer -> timeoutMinimum)))
        {
+          enet_protocol_record_disconnect_cause (host, peer, ENET_PEER_DISCONNECT_CAUSE_TIMEOUT);
           enet_protocol_notify_disconnect (host, peer, event);
 
           return 1;
